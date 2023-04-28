@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Canvas App with Bootstrap</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css">
+    
+    <style>
+      body {
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  #myCanvas {
+    position: relative;
+    background-image: url('negro.png');
+    background-size: cover;
+    margin-top: 50px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  #mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .custom-file-input {
+    cursor: pointer;
+  }
+  
+  .btn-custom {
+    background-color: #3d3d3d;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 30px;
+    margin-right: 10px;
+  }
+  
+  .btn-custom:hover {
+    background-color: #282828;
+    color: #fff;
+  }
+  
+  .range-slider {
+    margin-top: 20px;
+  }
+  
+  .range-slider input[type="range"] {
+    width: 100%;
+    height: 10px;
+    -webkit-appearance: none;
+    background-color: #ddd;
+    border-radius: 5px;
+    outline: none;
+    margin-top: 10px;
+  }
+
+  .range-slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background-color: #3d3d3d;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .range-slider input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background-color: #3d3d3d;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <canvas id="myCanvas" width="700" height="700"></canvas>
+        <div class="custom-file mt-4">
+          <input type="file" class="custom-file-input" id="image-input" multiple>
+          <label class="custom-file-label" for="image-input">Choose image</label>
+        </div>
+        <div class="d-flex justify-content-between mt-4">
+          <button class="btn btn-custom" onclick="moveImage('left')">Left</button>
+          <button class="btn btn-custom" onclick="moveImage('up')">Up</button>
+          <button class="btn btn-custom" onclick="moveImage('right')">Right</button>
+          <button class="btn btn-custom" onclick="moveImage('down')">Down</button>
+          <button id="share-btn">Compartir</button>
+
+        </div>
+        <div class="range-slider mt-4">
+          <input type="range" min="30" max="300" value="100" id="volume-slider">
+        </div>
+        <div class="d-flex justify-content-between mt-3">
+            <button id="reset-btn" class="btn btn-custom">Reset</button>
+            <button id="download-btn" class="btn btn-success">Download</button>
+            </div>
+            </div>
+            </div>
+            </div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/js/bootstrap.bundle.min.js"></script>
+            <script>
+  $(document).ready(function() {
+    // Change the custom-file-input text when an image is selected
+    $('.custom-file-input').on('change', function() {
+      var fileName = $(this).val().split('\\').pop();
+      $(this).siblings('.custom-file-label').html(fileName);
+    });
+    
+    // Reset the canvas and image position when the reset button is clicked
+    $('#reset-btn').on('click', function() {
+      resetCanvas();
+    });
+    
+    // Download the canvas as an image when the download button is clicked
+    $('#download-btn').on('click', function() {
+      downloadCanvas(this, 'myCanvas', 'canvas.png');
+    });
+    
+    // Move the image on the canvas
+    function moveImage(direction) {
+      var canvas = document.getElementById('myCanvas');
+      var ctx = canvas.getContext('2d');
+      var image = new Image();
+      image.src = canvas.toDataURL();
+      image.onload = function() {
+        var x = 0;
+        var y = 0;
+        var width = canvas.width;
+        var height = canvas.height;
+        
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Calculate the new position of the image
+        switch (direction) {
+          case 'left':
+            x = -10;
+            break;
+          case 'up':
+            y = -10;
+            break;
+          case 'right':
+            x = 10;
+            break;
+          case 'down':
+            y = 10;
+            break;
+        }
+        
+        // Draw the image on the canvas with the new position
+        ctx.drawImage(image, x, y, width, height);
+      };
+    }
+    
+    // Reset the canvas and image position
+    function resetCanvas() {
+      var canvas = document.getElementById('myCanvas');
+      var ctx = canvas.getContext('2d');
+      var image = new Image();
+      image.src = canvas.toDataURL();
+      image.onload = function() {
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw the image on the canvas with the original position
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      };
+    }
+    
+    // Download the canvas as an image
+    function downloadCanvas(link, canvasId, filename) {
+      link.href = document.getElementById(canvasId).toDataURL();
+      link.download = filename;
+    }
+  });
+  // Verificar si el dispositivo soporta la API de descarga
+if ('download' in HTMLAnchorElement.prototype) {
+  // Agregar evento de click al botón de descarga
+  downloadBtn.addEventListener('click', function() {
+    if (backgroundLoaded) { // Esperar a que la imagen de fondo se haya cargado
+      const link = document.createElement('a');
+      link.download = 'myImage.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+  });
+} else {
+  // Si el dispositivo no soporta la API de descarga, mostrar un mensaje de error
+  alert('Lo siento, tu dispositivo no soporta la descarga de archivos.');
+}
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+</script>
+
+
+
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+    const imageInput = document.getElementById('image-input');
+    const volumeSlider = document.getElementById('volume-slider');
+    const downloadBtn = document.getElementById('download-btn');
+    const resetBtn = document.getElementById('reset-btn');
+
+    const maskImage = new Image();
+    maskImage.src = 'jarra.png';
+
+    const userImage = new Image();
+    let backgroundLoaded = false; // Variable para controlar si la imagen de fondo se ha cargado
+
+    let xPosition = 50;
+    let yPosition = 50;
+
+    imageInput.addEventListener('change', function () {
+      const file = imageInput.files[0];
+      const reader = new FileReader();
+      reader.addEventListener('load', function () {
+        userImage.src = reader.result;
+      });
+      reader.readAsDataURL(file);
+    });
+
+    userImage.addEventListener('load', function () {
+      drawCanvas();
+    });
+
+    maskImage.addEventListener('load', function () {
+      drawCanvas();
+    });
+
+    volumeSlider.addEventListener('input', function () {
+      drawCanvas();
+    });
+
+    resetBtn.addEventListener('click', function () {
+      userImage.src = '';
+      drawCanvas();
+    });
+
+
+    downloadBtn.addEventListener('click', function () {
+      if (backgroundLoaded) { // Esperar a que la imagen de fondo se haya cargado
+        const link = document.createElement('a');
+        link.download = 'myImage.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      }
+    });
+
+    function moveImage(direction) {
+      if (userImage.src) {
+        if (direction === 'right') {
+          xPosition += 20;
+          drawCanvas();
+        } else if (direction === 'left') {
+          xPosition -= 20;
+          drawCanvas();
+        } else if (direction === 'up') {
+          yPosition -= 20;
+          drawCanvas();
+        } else if (direction === 'down') {
+          yPosition += 20;
+          drawCanvas();
+        }
+      }
+    }
+
+    function drawCanvas(includeBackgroundInDownload = false) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const scaleFactor = volumeSlider.value / 100;
+
+      if (includeBackgroundInDownload) {
+        const background = new Image();
+        background.src = 'negro.png';
+        background.onload = function () {
+          ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+          drawImages(scaleFactor);
+          backgroundLoaded = true; // Marcar que la imagen de fondo se ha cargado
+        }
+      } else {
+        drawImages(scaleFactor);
+        backgroundLoaded = true; // Marcar que la imagen de fondo se ha cargado
+      }
+    }
+
+    function drawImages(scaleFactor) {
+      if (userImage.src) {
+        ctx.drawImage(userImage, xPosition, yPosition, canvas.width * scaleFactor, canvas.height * scaleFactor);
+      }
+
+      if (maskImage.src) {
+        ctx.globalCompositeOperation = 'destination-in';
+        ctx.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+    }
+
+    //downloadBtn.addEventListener('click', function () {
+     // drawCanvas(true);
+     // if (backgroundLoaded) { // Esperar a que la imagen de fondo se haya cargado
+     //   const link = document.createElement('a');
+      //  link.download = 'myImage.png';
+       // link.href = canvas.toDataURL();
+       // link.click();
+     // }
+
+
+    //});
+
+
+    const backgroundImage = new Image();
+    backgroundImage.src = 'negro.png';
+    backgroundImage.addEventListener('load', function () {
+      backgroundLoaded = true;
+      drawCanvas();
+    });
+
+    const downloadCanvas = () => {
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+
+    const background = new Image();
+    background.onload = () => {
+      tempCtx.drawImage(background, 0, 0, canvas.width, canvas.height);
+      tempCtx.drawImage(canvas, 0, 0);
+      //Para añadir al html
+      const link = document.createElement('a');
+      link.download = 'myImage.png';
+      link.href = tempCanvas.toDataURL();
+      link.click();
+    };
+    background.src = 'negro.png';
+  };
+  downloadBtn.addEventListener("click",downloadCanvas)
+  const shareBtn = document.getElementById('share-btn');
+
+shareBtn.addEventListener('click', function() {
+  const canvas = document.getElementById('myCanvas');
+  canvas.toBlob(function(blob) {
+    const file = new File([blob], 'canvas.png', { type: 'image/png' });
+    const shareData = {
+      files: [file]
+    };
+    navigator.share(shareData);
+  });
+});
+$(document).ready(function() {
+  // ...
+
+  // Download the canvas as an image when the download button is clicked
+  $('#download-btn').on('click', function() {
+    var canvas = document.getElementById('myCanvas');
+    var imageData = canvas.toDataURL();
+    var fileName = 'canvas.png';
+    var uri = encodeURI(imageData);
+
+    // Request permission to write to the device's external storage
+    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
+      fileSystem.root.getDirectory('Download', {create: true}, function(directory) {
+        directory.getFile(fileName, {create: true}, function(fileEntry) {
+          fileEntry.createWriter(function(writer) {
+            writer.onwriteend = function() {
+              // Open the file in the device's gallery
+              cordova.plugins.fileOpener2.open(fileEntry.toURL(), 'image/png');
+            };
+            writer.write(decodeURIComponent(uri.split(',')[1]));
+          });
+        });
+      });
+    }, function(error) {
+      console.log('Error requesting file system: ' + error.code);
+    });
+  });
+});
+
+
+  </script>
+</body>
+
+</html>
+</body>
+
+</html>
